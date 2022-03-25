@@ -27,8 +27,8 @@
 
     protected override void OnInitialized()
     {
-        (privateKey,publicKey) = SiaSkynetClient.GenerateKeys("");
-        client = new SiaSkynetClient();
+        (privateKey,publicKey) = SiaSkynetClient.GenerateKeys("kodachi");
+        client = new SiaSkynetClient("https://wayback-siasky.milkey.workers.dev/");
     }
 
     private async void Callback()
