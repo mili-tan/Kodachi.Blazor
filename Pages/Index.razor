@@ -28,13 +28,13 @@
     protected override void OnInitialized()
     {
         (privateKey,publicKey) = SiaSkynetClient.GenerateKeys("kodachi");
-        client = new SiaSkynetClient("https://wayback-siasky.milkey.workers.dev/");
+        client = new SiaSkynetClient();
     }
 
     private async void Callback()
     {
         var uid = Guid.NewGuid().ToString();
         await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
-        url = await client.SkyDbGetAsString(publicKey, new RegistryKey(uid));
+        url = url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)) ? uid : "Error";
     }
 }
