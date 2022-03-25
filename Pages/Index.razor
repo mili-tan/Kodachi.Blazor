@@ -14,16 +14,22 @@
                                 <div class="spinner-grow spinner-grow-sm p-1 m-1" role="status"></div>
                             </button>
                         }
-                        else if (status == "done")
-                        {
-                            <button style="width:55px" class="btn btn-success" type="button" disabled>
-                                <div class="oi oi-check"></div>
-                            </button>
-                        }
                         else if (status == "error")
                         {
                             <button style="width:55px" class="btn btn-danger" type="button" disabled>
                                 <div class="oi oi-warning"></div>
+                            </button>
+                        }
+                        else if (status == "invalid")
+                        {
+                            <button style="width:55px" class="btn btn-warning" type="button" @onclick="Clean">
+                                <div class="oi oi-delete"></div>
+                            </button>
+                        }
+                        else if (status == "done")
+                        {
+                            <button style="width:55px" class="btn btn-success" type="button" @onclick="Clean">
+                                <div class="oi oi-check"></div>
                             </button>
                         }
                         else
@@ -60,6 +66,12 @@
     {
         try
         {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out _))
+            {
+                status = "invalid";
+                return;
+            }
+
             status = "loading";
             var uid = Guid.NewGuid().ToString();
             var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
@@ -79,4 +91,11 @@
             status = "error";
         }
     }
+
+    private void Clean()
+    {
+        url = string.Empty;
+        status = string.Empty;
+    }
+
 }
