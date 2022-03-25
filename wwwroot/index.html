@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Kodachi</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="Kodachi.styles.css" rel="stylesheet" />
+    <link href="manifest.json" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+</head>
+
+<body>
+    <div id="app" />
+    <app>
+        <h1 id="progressvalue" style="position: absolute; top: 50%; width: 100%; text-align: center; font-weight: 100; font-size: 3em; margin-top: -1.33em; color: #000; "></h1>
+        <span id="progressbar" style='position: absolute; top: 50%; height: 2px; background: linear-gradient(90deg, rgba(247, 149, 51, 0.101961) 0, rgba(243, 112, 85, 0.101961) 15%, rgba(239, 78, 123, 0.101961) 30%, rgba(161, 102, 171, 0.101961) 44%, rgba(80, 115, 184, 0.101961) 58%, rgba(16, 152, 173, 0.101961) 72%, rgba(7, 179, 155, 0.101961) 86%, rgba(109, 186, 130, 0.101961) 100%); '></span>
+    </app>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="_content/Nethereum.Metamask.Blazor/NethereumMetamask.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/brotli/js/decode.js"></script>
+    <script type="module">
+        var i = 0;
+        var allResourcesBeingLoaded = [];
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
+                    allResourcesBeingLoaded.push(defaultUri);
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        else {
+                            i++;
+                            var total = allResourcesBeingLoaded.length;
+                            var progressbar = document.getElementById('progressbar');
+                            var progressvalue = document.getElementById('progressvalue');
+                            var value = parseInt((i * 100.0) / total);
+                            var pct = value + '%';
+                            progressbar.style.width = pct;
+                            progressvalue.innerHTML = pct;
+                            console.info(i + '/' + total + ' (' + pct + ') ' + name);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type ===
+                            'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray,
+                            { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
