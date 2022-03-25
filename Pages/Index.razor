@@ -8,7 +8,7 @@
                 <div class="input-group mb-3">
                     <input type="text" class="form-control form-input" placeholder="Enter URL here..." @bind="url">
                     <div class="input-group-append">
-                        <button class="btn btn-secondary" type="button" @onclick="Callback">Make It Shorter</button>
+                        <button class="btn btn-secondary" type="button" @onclick="async () => await Callback()">Make It Shorter</button>
                     </div>
                 </div>
                 <footer class="pt-3 mt-4 text-muted text-center small">
@@ -31,10 +31,13 @@
         client = new SiaSkynetClient();
     }
 
-    private async void Callback()
+    private async Task Callback()
     {
         var uid = Guid.NewGuid().ToString();
         await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
-        url = url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)) ? uid : "Error";
+        var get = await client.SkyDbGetAsString(publicKey, new RegistryKey(uid));
+        url = url == get ? uid : "Error";
+        Console.WriteLine("GET:" + get);
+        Console.WriteLine("UID:" + uid);
     }
 }
