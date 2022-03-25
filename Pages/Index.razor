@@ -8,7 +8,19 @@
                 <div class="input-group mb-3">
                     <input type="text" class="form-control form-input" placeholder="Enter URL here..." @bind="url">
                     <div class="input-group-append">
-                        <button class="btn btn-secondary" type="button" @onclick="async () => await Callback()">Make It Shorter</button>
+                        @if (enable)
+                        {
+                            <button class="btn btn-secondary" type="button" @onclick="async () => await Callback()">
+                                Make It Shorter
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" type="button" disabled>
+                                <span class="spinner-grow spinner-grow-sm" role="status"></span>
+                                Loading...
+                            </button>
+                        }
                     </div>
                 </div>
                 <footer class="pt-3 mt-4 text-muted text-center small">
@@ -24,6 +36,7 @@
     byte[] privateKey;
     byte[] publicKey;
     SiaSkynetClient client;
+    bool enable = true;
 
     protected override void OnInitialized()
     {
@@ -33,11 +46,13 @@
 
     private async Task Callback()
     {
+        enable = false;
         var uid = Guid.NewGuid().ToString();
         await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
         var get = await client.SkyDbGetAsString(publicKey, new RegistryKey(uid));
         url = url == get ? uid : "Error";
         Console.WriteLine("GET:" + get);
         Console.WriteLine("UID:" + uid);
+        enable = true;
     }
 }
