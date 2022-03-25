@@ -8,23 +8,35 @@
                 <div class="input-group mb-3">
                     <input type="text" class="form-control form-input" placeholder="Enter URL here..." @bind="url">
                     <div class="input-group-append">
-                        @if (enable)
+                        @if (status == "loading")
                         {
-                            <button class="btn btn-secondary" type="button" @onclick="async () => await Callback()">
-                                Make It Shorter
+                            <button style="width:55px" class="btn btn-primary" type="button" disabled>
+                                <div class="spinner-grow spinner-grow-sm p-1 m-1" role="status"></div>
+                            </button>
+                        }
+                        else if (status == "done")
+                        {
+                            <button style="width:55px" class="btn btn-success" type="button" disabled>
+                                <div class="oi oi-check"></div>
+                            </button>
+                        }
+                        else if (status == "error")
+                        {
+                            <button style="width:55px" class="btn btn-danger" type="button" disabled>
+                                <div class="oi oi-warning"></div>
                             </button>
                         }
                         else
                         {
-                            <button class="btn btn-primary" type="button" disabled>
-                                <span class="spinner-grow spinner-grow-sm" role="status"></span>
-                                Loading...
+                            <button style="width:55px" class="btn btn-secondary" type="button" @onclick="async () => await Callback()">
+                                <div class="oi oi-chevron-right p-1 m-1"></div>
                             </button>
                         }
                     </div>
                 </div>
-                <footer class="pt-3 mt-4 text-muted text-center small">
-                    &copy; Kodachi by Mili.ONE Network @DateTime.Now.Year
+                <footer class="pt-3 mt-3 text-muted text-center small">
+                    <div>&copy; Kodachi by Mili.ONE Network @DateTime.Now.Year</div>
+                    <img class="m-3" src="https://siasky.net/AQCIcIe2dq4na7MA5Tu7GBdekAgABBj4Z6Q8_2TcmrD0AQ/img/build-with-skynet.svg" width="75">
                 </footer>
             </div>
         </div>
@@ -36,7 +48,7 @@
     byte[] privateKey;
     byte[] publicKey;
     SiaSkynetClient client;
-    bool enable = true;
+    string status = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -46,13 +58,25 @@
 
     private async Task Callback()
     {
-        enable = false;
-        var uid = Guid.NewGuid().ToString();
-        await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
-        var get = await client.SkyDbGetAsString(publicKey, new RegistryKey(uid));
-        url = url == get ? uid : "Error";
-        Console.WriteLine("GET:" + get);
-        Console.WriteLine("UID:" + uid);
-        enable = true;
+        try
+        {
+            status = "loading";
+            var uid = Guid.NewGuid().ToString();
+            var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
+            if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
+            {
+                url = uid;
+                status = "done";
+            }
+            else
+            {
+                status = "error";
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            status = "error";
+        }
     }
 }
