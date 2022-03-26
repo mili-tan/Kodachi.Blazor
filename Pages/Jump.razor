@@ -1,8 +1,37 @@
-﻿@page "/{text}"
+﻿@page "/{uid}"
+@using SiaSkynet
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
 
-<h1>Hello @Text!</h1>
+<h1>Redirect to @url</h1>
 
 @code {
     [Parameter]
-    public string Text { get; set; }
+    public string Uid { get; set; }
+
+    string url = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var (_,publicKey) = SiaSkynetClient.GenerateKeys("kodachi");
+            var client = new SiaSkynetClient();
+            url = await client.SkyDbGetAsString(publicKey,new RegistryKey(Uid));
+            if (string.IsNullOrEmpty(url))
+            {
+                toastService.ShowWarning("The target link could not be found. ","Not Found");
+            }
+            else
+            {
+                NavigationManager.NavigateTo(url, true);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            toastService.ShowError(e.Message, "Error!");
+        }
+    }
+
 }
