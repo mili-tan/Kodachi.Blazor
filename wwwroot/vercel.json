@@ -1,4 +1,10 @@
 ﻿{
-  "version": 2,
-  "routes": [{"handle": "filesystem"}, {"src": "/.*", "dest": "/index.html"}]
+  "routes": [
+    { "handle": "filesystem" },
+    {
+      "src": "/(.*)",
+      "status": 404,
+      "dest": "/index.html"
+    }
+  ]
 }
