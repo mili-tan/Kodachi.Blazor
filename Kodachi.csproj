@@ -14,7 +14,9 @@
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-    <None Include="publish/wwwroot/vercel.json"  CopyToPublishDirectory="PreserveNewest" />
+    <None Include="wwwroot\vercel.json" PublishedContent="wwwroot\vercel.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
