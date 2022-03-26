@@ -3,7 +3,7 @@
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 
-<h1>Redirect to @url</h1>
+<h1>Redirect to @(string.IsNullOrEmpty(url)?"…":url)</h1>
 
 @code {
     [Parameter]
