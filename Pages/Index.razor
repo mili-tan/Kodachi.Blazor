@@ -55,6 +55,7 @@
     byte[] publicKey;
     SiaSkynetClient client;
     string status = string.Empty;
+    string baseUrl = "https://kurl.vercel.app/";
 
     protected override void OnInitialized()
     {
@@ -71,13 +72,13 @@
                 status = "invalid";
                 return;
             }
-
             status = "loading";
-            var uid = Guid.NewGuid().ToString();
+
+            var uid = Zuid.Compress(Guid.NewGuid());
             var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
             if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
             {
-                url = uid;
+                url = baseUrl + uid;
                 status = "done";
             }
             else
