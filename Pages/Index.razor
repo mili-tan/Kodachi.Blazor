@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using SiaSkynet
 @inject IToastService toastService
+@inject NavigationManager navigationManager
 
 <div class="container">
     <div class="row height d-flex justify-content-center align-items-center">
@@ -56,7 +57,6 @@
     byte[] publicKey;
     SiaSkynetClient client;
     string status = string.Empty;
-    string baseUrl = "https://kurl.vercel.app/";
 
     protected override void OnInitialized()
     {
@@ -81,7 +81,7 @@
             var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
             if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
             {
-                url = baseUrl + uid;
+                url = navigationManager.BaseUri + uid;
                 status = "done";
                 toastService.ShowSuccess("Created successfully.", "Success!");
             }
