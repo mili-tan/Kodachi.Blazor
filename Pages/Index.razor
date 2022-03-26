@@ -77,7 +77,7 @@
             }
             status = "loading";
 
-            var uid = Zuid.Compress(Guid.NewGuid());
+            var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
             var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
             if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
             {
