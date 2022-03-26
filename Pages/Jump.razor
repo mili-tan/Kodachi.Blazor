@@ -1,7 +1,7 @@
 ﻿@page "/{uid}"
 @using SiaSkynet
 @inject IToastService toastService
-@inject NavigationManager NavigationManager
+@inject NavigationManager navigationManager
 
 <h1 class="display-1">Redirect to @(string.IsNullOrEmpty(url)?"…":url)</h1>
 
@@ -24,7 +24,7 @@
             }
             else
             {
-                NavigationManager.NavigateTo(url, true);
+                navigationManager.NavigateTo(url, true);
             }
         }
         catch (Exception e)
