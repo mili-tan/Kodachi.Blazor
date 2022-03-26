@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using SiaSkynet
+@inject IToastService toastService
 
 <div class="container">
     <div class="row height d-flex justify-content-center align-items-center">
@@ -70,6 +71,8 @@
             if (!Uri.TryCreate(url, UriKind.Absolute, out _))
             {
                 status = "invalid";
+                toastService.ShowWarning("Invalid link.", "Invalid!");
+
                 return;
             }
             status = "loading";
@@ -80,15 +83,18 @@
             {
                 url = baseUrl + uid;
                 status = "done";
+                toastService.ShowSuccess("Created successfully.", "Success!");
             }
             else
             {
                 status = "error";
+                toastService.ShowError("Create failed.", "Error!");
             }
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
+            toastService.ShowError(e.Message, "Error!");
             status = "error";
         }
     }
