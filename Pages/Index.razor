@@ -79,18 +79,23 @@
             }
             status = "loading";
 
-            var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
-            var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
-            if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
+            try
             {
-                url = navigationManager.BaseUri + uid;
-                status = "done";
-                toastService.ShowSuccess("Created successfully.", "Success!");
+                var uid = await client.SkyDbGetAsString(publicKey,new RegistryKey(url));
+                if (!string.IsNullOrEmpty(uid))
+                {
+                    url = navigationManager.BaseUri + uid;
+                    status = "done";
+                    toastService.ShowSuccess("The link was already created.", "Success!");
+                }
+                else
+                {
+                    navigationManager.NavigateTo(url, true);
+                }
             }
-            else
+            catch (Exception)
             {
-                status = "error";
-                toastService.ShowError("Create failed.", "Error!");
+                await CreateUrl();
             }
         }
         catch (Exception e)
@@ -98,6 +103,24 @@
             Console.WriteLine(e);
             toastService.ShowError(e.Message, "Error!");
             status = "error";
+        }
+    }
+
+    public async Task CreateUrl()
+    {
+        var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
+        var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
+        await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(url), uid);
+        if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
+        {
+            url = navigationManager.BaseUri + uid;
+            status = "done";
+            toastService.ShowSuccess("Created successfully.", "Success!");
+        }
+        else
+        {
+            status = "error";
+            toastService.ShowError("Create failed.", "Error!");
         }
     }
 
