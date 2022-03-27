@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using SiaSkynet
+@using Append.Blazor.Clipboard
+@inject IClipboardService clipboardService
 @inject IToastService toastService
 @inject NavigationManager navigationManager
 
@@ -30,7 +32,7 @@
                         }
                         else if (status == "done")
                         {
-                            <button style="width:55px" class="btn btn-success" type="button" @onclick="Clean">
+                            <button style="width:55px" class="btn btn-success" type="button" @onclick="async () => await CopyAndClean()">
                                 <div class="oi oi-check"></div>
                             </button>
                         }
@@ -97,6 +99,13 @@
             toastService.ShowError(e.Message, "Error!");
             status = "error";
         }
+    }
+
+    private async Task CopyAndClean()
+    {
+        await clipboardService.CopyTextToClipboardAsync(url);
+        url = string.Empty;
+        status = string.Empty;
     }
 
     private void Clean()
