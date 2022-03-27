@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using SiaSkynet
 @using Append.Blazor.Clipboard
+@using NeoSmart.Utils
+@using System.Text
 @inject IClipboardService clipboardService
 @inject IToastService toastService
 @inject NavigationManager navigationManager
@@ -81,7 +83,7 @@
 
             try
             {
-                var uid = await client.SkyDbGetAsString(publicKey,new RegistryKey(url));
+                var uid = await client.SkyDbGetAsString(publicKey,new RegistryKey(UrlBase64.Encode(Encoding.UTF8.GetBytes(url))));
                 if (!string.IsNullOrEmpty(uid))
                 {
                     url = navigationManager.BaseUri + uid;
@@ -110,7 +112,7 @@
     {
         var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
         var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
-        await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(url), uid);
+        await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(UrlBase64.Encode(Encoding.UTF8.GetBytes(url))), uid);
         if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
         {
             url = navigationManager.BaseUri + uid;
