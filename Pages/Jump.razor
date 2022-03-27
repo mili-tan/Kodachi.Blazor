@@ -3,7 +3,15 @@
 @inject IToastService toastService
 @inject NavigationManager navigationManager
 
-<h1 class="display-1">Redirect to @(string.IsNullOrEmpty(url)?"…":url)</h1>
+<h1 class="display-1">Redirect to @if (!string.IsNullOrEmpty(url))
+    {
+        <a href="@url">@url</a> 
+    }
+    else
+    {
+        <span>…</span>
+    }
+</h1>
 
 @code {
     [Parameter]
