@@ -104,6 +104,7 @@
     private async Task CopyAndClean()
     {
         await clipboardService.CopyTextToClipboardAsync(url);
+        toastService.ShowSuccess("Copied to clipboard.", "Copied!");
         url = string.Empty;
         status = string.Empty;
     }
