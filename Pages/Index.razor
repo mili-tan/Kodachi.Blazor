@@ -110,7 +110,7 @@
 
     public async Task CreateUrl()
     {
-        var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
+        var uid = await GetNonexistentZuid();
         var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
         await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(UrlBase64.Encode(Encoding.UTF8.GetBytes(url))), uid);
         if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
@@ -123,6 +123,25 @@
         {
             status = "error";
             toastService.ShowError("Create failed.", "Error!");
+        }
+    }
+
+    private async Task<string> GetNonexistentZuid()
+    {
+        while (true)
+        {
+            var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
+            try
+            {
+                if (string.IsNullOrEmpty(await client.SkyDbGetAsString(publicKey, new RegistryKey(uid))))
+                {
+                    return uid;
+                }
+            }
+            catch (Exception)
+            {
+                return uid;
+            }
         }
     }
 
