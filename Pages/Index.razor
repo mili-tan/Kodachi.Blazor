@@ -87,9 +87,16 @@
                 var uid = await client.SkyDbGetAsString(publicKey,new RegistryKey(UrlBase64.Encode(Encoding.UTF8.GetBytes(url))));
                 if (!string.IsNullOrEmpty(uid))
                 {
-                    url = navigationManager.BaseUri + uid;
-                    status = "done";
-                    toastService.ShowSuccess("The link was already created.", "Success!");
+                    if (uid.Split('.').LastOrDefault().ToLower() != GetFNV(url).ToLower())
+                    {
+                        await CreateUrl();
+                    }
+                    else
+                    {
+                        url = navigationManager.BaseUri + uid;
+                        status = "done";
+                        toastService.ShowSuccess("The link was already created.", "Success!");
+                    }
                 }
                 else
                 {
