@@ -118,7 +118,7 @@
 
     public async Task CreateUrl()
     {
-        var uid = (Zuid.Compress(Guid.NewGuid()) + "." + GetFNV(url)).ToLower();
+        var uid = (Zuid.Compress32(Guid.NewGuid()) + "." + GetFNV(url)).ToLower();
         var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
         await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(UrlBase64.Encode(Encoding.UTF8.GetBytes(url))), uid);
         if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))

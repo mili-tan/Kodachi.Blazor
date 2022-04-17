@@ -11,5 +11,13 @@ namespace Kodachi
                 .Replace("/", "-").Replace("+", "_")
                 .Replace("=", "");
         }
+
+        public static string Compress32(Guid guid)
+        {
+            return Convert.ToBase64String(
+                    BitConverter.GetBytes(BitConverter.ToInt32(guid.ToByteArray())))
+                .Replace("/", "-").Replace("+", "_")
+                .Replace("=", "");
+        }
     }
 }
