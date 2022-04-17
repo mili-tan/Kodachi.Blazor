@@ -3,6 +3,7 @@
 @using Append.Blazor.Clipboard
 @using NeoSmart.Utils
 @using System.Text
+@using System.Security.Cryptography
 @inject IClipboardService clipboardService
 @inject IToastService toastService
 @inject NavigationManager navigationManager
@@ -110,7 +111,7 @@
 
     public async Task CreateUrl()
     {
-        var uid = await GetNonexistentZuid();
+        var uid = (Zuid.Compress(Guid.NewGuid()) + "." + GetFNV(url)).ToLower();
         var res = await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(uid), url);
         await client.SkyDbSetAsString(privateKey, publicKey, new RegistryKey(UrlBase64.Encode(Encoding.UTF8.GetBytes(url))), uid);
         if (res && url == await client.SkyDbGetAsString(publicKey, new RegistryKey(uid)))
@@ -126,23 +127,11 @@
         }
     }
 
-    private async Task<string> GetNonexistentZuid()
+    private static string GetFNV(string str)
     {
-        while (true)
-        {
-            var uid = Zuid.Compress(Guid.NewGuid()).ToLower();
-            try
-            {
-                if (string.IsNullOrEmpty(await client.SkyDbGetAsString(publicKey, new RegistryKey(uid))))
-                {
-                    return uid;
-                }
-            }
-            catch (Exception)
-            {
-                return uid;
-            }
-        }
+        return Convert.ToBase64String(FNV1a.Create().ComputeHash(Encoding.UTF8.GetBytes(str)))
+            .Replace("/", "-").Replace("+", "_")
+            .Replace("=", "");
     }
 
     private async Task CopyAndClean()
