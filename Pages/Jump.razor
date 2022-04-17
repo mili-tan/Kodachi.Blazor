@@ -1,5 +1,7 @@
 ﻿@page "/{uid}"
 @using SiaSkynet
+@using System.Security.Cryptography
+@using System.Text
 @inject IToastService toastService
 @inject NavigationManager navigationManager
 
@@ -30,6 +32,10 @@
             {
                 toastService.ShowWarning("The target link could not be found. ","Not Found");
             }
+            else if (Uid.Split('.').LastOrDefault().ToLower() != GetFNV(url).ToLower())
+            {
+                toastService.ShowError("The target link check failed and may have been tampered. ","Check Failed");
+            }
             else
             {
                 navigationManager.NavigateTo(url, true);
@@ -42,4 +48,10 @@
         }
     }
 
+    private static string GetFNV(string str)
+    {
+        return Convert.ToBase64String(FNV1a.Create().ComputeHash(Encoding.UTF8.GetBytes(str)))
+            .Replace("/", "-").Replace("+", "_")
+            .Replace("=", "");
+    }
 }
