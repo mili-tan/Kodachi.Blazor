@@ -66,7 +66,7 @@
     protected override void OnInitialized()
     {
         (privateKey,publicKey) = SiaSkynetClient.GenerateKeys("kodachi");
-        client = new SiaSkynetClient("https://wayback-siasky.milkey.workers.dev/");
+        client = new SiaSkynetClient("https://kodachi-sky.vercel.app/");
     }
 
     private async Task Callback()
